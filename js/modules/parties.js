@@ -68,6 +68,15 @@ export function removeParty(state, id) {
   return removed;
 }
 
+/** Cambia el color de campaña de un partido ya inscrito. */
+export function changePartyColor(state, id, token) {
+  if (!isPaletteToken(token)) return null;
+  const party = state.parties.find((p) => p.id === id);
+  if (!party) return null;
+  party.color = token;
+  return party;
+}
+
 export function hasDuplicate(state, name) {
   return isDuplicate(state, normalizeName(name));
 }

@@ -11,6 +11,7 @@ import {
   validatePartyInput,
   addParty,
   removeParty,
+  changePartyColor,
 } from './modules/parties.js';
 
 const state = loadState();
@@ -52,16 +53,32 @@ function renderSwatches() {
   });
 }
 
-function chip(token) {
-  const node = el('span', { className: 'roster__chip' });
-  node.style.setProperty('--chip', `var(${token})`);
-  return node;
-}
-
 function partyChip(token) {
   const node = el('span', { className: 'party__chip' });
   node.style.setProperty('--chip', `var(${token})`);
   return node;
+}
+
+/* — Selector de color de campaña para un partido ya inscrito — */
+function colorPicker(id, token) {
+  const details = el('details', { className: 'roster-color' });
+  const trigger = el('summary', { className: 'roster-color__trigger' });
+  trigger.style.setProperty('--chip', `var(${token})`);
+  trigger.setAttribute('aria-label', 'Cambiar color');
+  const swatches = el('span', { className: 'roster-color__swatches' });
+  for (const c of partyRules.palette) {
+    const swatch = el('button', {
+      className: c.token === token ? 'roster-color__swatch is-active' : 'roster-color__swatch',
+      attrs: { type: 'button', 'aria-label': c.name, title: c.name },
+    });
+    swatch.style.setProperty('--chip', `var(${c.token})`);
+    swatch.dataset.action = 'repaint';
+    swatch.dataset.id = id;
+    swatch.dataset.color = c.token;
+    swatches.append(swatch);
+  }
+  details.append(trigger, swatches);
+  return details;
 }
 
 /* — Patrón (listado de inscritos) — */
@@ -84,7 +101,7 @@ function renderRoster() {
       el('li', {
         className: 'roster__item',
         children: [
-          chip(p.color),
+          colorPicker(p.id, p.color),
           el('span', { className: 'roster__name', text: p.name }),
           el('span', { className: 'roster__votes tabular', text: `${p.votes}` }),
           del,
@@ -204,8 +221,17 @@ form.addEventListener('submit', (e) => {
   renderAll();
 });
 
-/* — Baja de partidos (optimista, con deshacer) — */
+/* — Baja de partidos (optimista, con deshacer) y cambio de color — */
 roster.addEventListener('click', (e) => {
+  const repaint = e.target.closest('[data-action="repaint"]');
+  if (repaint) {
+    const changed = changePartyColor(state, repaint.dataset.id, repaint.dataset.color);
+    if (!changed) return;
+    saveState(state);
+    renderAll();
+    return;
+  }
+
   const btn = e.target.closest('.roster__delete');
   if (!btn) return;
   const removed = removeParty(state, btn.dataset.id);
