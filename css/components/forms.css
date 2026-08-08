@@ -87,6 +87,10 @@
   gap: var(--space-xs);
 }
 
+.field > .swatches {
+  margin-block-start: var(--space-sm);
+}
+
 .swatch-label {
   position: relative;
   width: 40px;
