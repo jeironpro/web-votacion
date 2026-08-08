@@ -12,9 +12,23 @@ import {
   addParty,
   removeParty,
   changePartyColor,
+  normalizeColor,
 } from './modules/parties.js';
 
 const state = loadState();
+
+/** Devuelve el valor CSS de --chip: variable de paleta o hex directo. */
+function chipOf(color) {
+  return isHex(color) ? color : `var(${color})`;
+}
+
+function isHex(value) {
+  return typeof value === 'string' && value.startsWith('#');
+}
+
+function defaultHex(color) {
+  return /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(color) ? normalizeColor(color) : '#666666';
+}
 
 /* — Referencias al DOM — */
 const form = byId('party-form');
@@ -31,7 +45,9 @@ const closeBtn = byId('close-sidebar');
 const scrim = byId('scrim');
 const sidebar = byId('sidebar');
 
-/* — Paleta de campaña (radios convertidos en sellos de color) — */
+/* — Paleta de campaña (radios convertidos en sellos) + picker libre — */
+let customPickerColor = null;
+
 function renderSwatches() {
   clear(swatchesBox);
   partyRules.palette.forEach((color, index) => {
@@ -45,38 +61,58 @@ function renderSwatches() {
         'aria-label': color.name,
       },
     });
-    if (index === 0) input.checked = true;
+    if (index === 0 && customPickerColor === null) input.checked = true;
     const swatch = el('span', { className: 'swatch' });
-    swatch.style.setProperty('--chip', `var(${color.token})`);
+    swatch.style.setProperty('--chip', chipOf(color.token));
     label.append(input, swatch);
     swatchesBox.append(label);
   });
+
+  const pickerLabel = el('label', { className: 'swatch-label' });
+  const picker = el('input', {
+    className: 'swatch-input',
+    attrs: { type: 'color', name: 'color-custom', 'aria-label': 'Color personalizado' },
+  });
+  picker.value = customPickerColor || '#8a4f7d';
+  const pickerSwatch = el('span', { className: 'swatch' });
+  pickerSwatch.style.setProperty('--chip', picker.value);
+  pickerLabel.append(picker, pickerSwatch);
+  swatchesBox.append(pickerLabel);
 }
 
 function partyChip(token) {
   const node = el('span', { className: 'party__chip' });
-  node.style.setProperty('--chip', `var(${token})`);
+  node.style.setProperty('--chip', chipOf(token));
   return node;
 }
 
 /* — Selector de color de campaña para un partido ya inscrito — */
-function colorPicker(id, token) {
+function colorPicker(id, color) {
   const details = el('details', { className: 'roster-color' });
   const trigger = el('summary', { className: 'roster-color__trigger' });
-  trigger.style.setProperty('--chip', `var(${token})`);
+  trigger.style.setProperty('--chip', chipOf(color));
   trigger.setAttribute('aria-label', 'Cambiar color');
   const swatches = el('span', { className: 'roster-color__swatches' });
   for (const c of partyRules.palette) {
     const swatch = el('button', {
-      className: c.token === token ? 'roster-color__swatch is-active' : 'roster-color__swatch',
+      className: c.token === color ? 'roster-color__swatch is-active' : 'roster-color__swatch',
       attrs: { type: 'button', 'aria-label': c.name, title: c.name },
     });
-    swatch.style.setProperty('--chip', `var(${c.token})`);
+    swatch.style.setProperty('--chip', chipOf(c.token));
     swatch.dataset.action = 'repaint';
     swatch.dataset.id = id;
     swatch.dataset.color = c.token;
     swatches.append(swatch);
   }
+
+  const picker = el('input', {
+    className: 'roster-color__picker',
+    attrs: { type: 'color', 'aria-label': 'Color personalizado', value: defaultHex(color) },
+  });
+  picker.dataset.action = 'repaint-custom';
+  picker.dataset.id = id;
+  swatches.append(picker);
+
   details.append(trigger, swatches);
   return details;
 }
@@ -202,7 +238,8 @@ nameInput.addEventListener('input', () => {
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
-  const color = swatchesBox.querySelector('input[name="color"]:checked')?.value
+  const color = customPickerColor
+    ?? swatchesBox.querySelector('input[name="color"]:checked')?.value
     ?? partyRules.palette[0].token;
   const result = validatePartyInput(state, { name: nameInput.value, color });
 
@@ -213,12 +250,37 @@ form.addEventListener('submit', (e) => {
   }
 
   clearError();
-  addParty(state, { name: result.name, color });
+  addParty(state, { name: result.name, color: result.color });
   saveState(state);
   form.reset();
-  const first = swatchesBox.querySelector('input[name="color"]');
-  if (first) first.checked = true;
+  customPickerColor = null;
+  renderSwatches();
   renderAll();
+});
+
+/* — Paleta: al tocar el picker custom se deseleccionan los sellos y viceversa — */
+swatchesBox.addEventListener('input', (e) => {
+  const target = e.target;
+  if (target.matches('input[name="color-custom"]')) {
+    customPickerColor = target.value;
+    const sync = swatchesBox.querySelector('input[name="color-custom"]').parentElement
+      .querySelector('.swatch');
+    sync.style.setProperty('--chip', target.value);
+    swatchesBox.querySelectorAll('input[name="color"]').forEach((r) => {
+      r.checked = false;
+    });
+    swatchesBox.querySelectorAll('.swatch-input').forEach((i) => i.classList.remove('is-success'));
+    target.classList.add('is-success');
+  }
+});
+
+swatchesBox.addEventListener('change', (e) => {
+  if (e.target.matches('input[name="color"]')) {
+    customPickerColor = null;
+    swatchesBox.querySelectorAll('.swatch-input').forEach((i) => i.classList.remove('is-success'));
+    const custom = swatchesBox.querySelector('input[name="color-custom"]');
+    if (custom) custom.classList.remove('is-success');
+  }
 });
 
 /* — Baja de partidos (optimista, con deshacer) y cambio de color — */
@@ -250,6 +312,16 @@ roster.addEventListener('click', (e) => {
       },
     },
   });
+});
+
+/* — Color personalizado de un partido ya inscrito (input nativo) — */
+roster.addEventListener('input', (e) => {
+  const target = e.target.closest('.roster-color__picker');
+  if (!target) return;
+  const changed = changePartyColor(state, target.dataset.id, target.value);
+  if (!changed) return;
+  saveState(state);
+  renderAll();
 });
 
 /* — Arranque — */

@@ -19,6 +19,8 @@ const PALETTE = Object.freeze([
 
 const MAX_NAME_LENGTH = 40;
 
+const HEX_RE = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
+
 function normalizeName(name) {
   return name.replace(/\s+/g, ' ').trim();
 }
@@ -34,6 +36,21 @@ function isPaletteToken(token) {
   return PALETTE.some((c) => c.token === token);
 }
 
+/** Un color es válido si es de la paleta o un hex (#rgb / #rrggbb). */
+function isColor(value) {
+  return typeof value === 'string' && (isPaletteToken(value) || HEX_RE.test(value));
+}
+
+/** Normaliza un color a token de paleta o a hex de 6 dígitos en minúsculas. */
+export function normalizeColor(value) {
+  if (!isColor(value)) return null;
+  if (isPaletteToken(value)) return value;
+  const hex = value.toLowerCase();
+  return hex.length === 4
+    ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
+    : hex;
+}
+
 /** Valida los datos de un partido nuevo. Devuelve { error } o { name, color }. */
 export function validatePartyInput(state, { name, color }) {
   const cleaned = normalizeName(name);
@@ -43,13 +60,14 @@ export function validatePartyInput(state, { name, color }) {
   if (cleaned.length > MAX_NAME_LENGTH) {
     return { error: `El nombre no puede pasar de ${MAX_NAME_LENGTH} caracteres.` };
   }
-  if (!isPaletteToken(color)) {
+  const normalizedColor = normalizeColor(color);
+  if (!normalizedColor) {
     return { error: 'Elige un color de campaña válido.' };
   }
   if (isDuplicate(state, cleaned)) {
     return { error: 'Ese partido ya está inscrito.' };
   }
-  return { name: cleaned, color };
+  return { name: cleaned, color: normalizedColor };
 }
 
 /** Añade un partido al estado y lo devuelve. No valida (usa validateParty antes). */
@@ -69,11 +87,12 @@ export function removeParty(state, id) {
 }
 
 /** Cambia el color de campaña de un partido ya inscrito. */
-export function changePartyColor(state, id, token) {
-  if (!isPaletteToken(token)) return null;
+export function changePartyColor(state, id, value) {
+  const color = normalizeColor(value);
+  if (!color) return null;
   const party = state.parties.find((p) => p.id === id);
   if (!party) return null;
-  party.color = token;
+  party.color = color;
   return party;
 }
 
