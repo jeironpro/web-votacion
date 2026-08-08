@@ -11,3 +11,6 @@ node_modules/
 
 # Logs
 *.log
+
+# Skills locales de agente (no versionables)
+.agents/
