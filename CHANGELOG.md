@@ -4,6 +4,16 @@ Todos los cambios notables de **La Papeleta** se documentan aquí.
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
+## [0.2.0] — 2026-08-08
+
+### Added
+
+- Padrón funcional en el panel derecho: alta de partidos con nombre y color de campaña (paleta de 10 sellos).
+- Validación del formulario (nombre obligatorio, máx. 40 caracteres, sin duplicados, color válido) con estados de error accesibles.
+- Baja de partidos optimista desde el padrón, con aviso de deshacer.
+- Persistencia del estado en `localStorage` (servicio `storage.js`) y renderizado seguro en módulos ES (`dom.js`, sin `innerHTML`).
+- Presentación mínima de los partidos en la columna principal; el escrutinio llega en la siguiente entrega.
+
 ## [0.1.0] — 2026-08-08
 
 ### Added
