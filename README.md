@@ -1,6 +1,6 @@
 # La Papeleta
 
-## 📌 Descripción
+## Descripción
 
 **La Papeleta** es una aplicación web de votación por partidos, pensada como pieza de portafolio. Cualquier persona vota por un partido —entre los inscritos— y el partido con más votos gana. El escrutinio es único, vivo y en abierto.
 
@@ -13,11 +13,11 @@ Puntos de diseño:
 - Persistencia **local** (`localStorage`): sin servidores, sin cuentas. Los datos viven únicamente en el navegador.
 - Estilo editorial de papeleta/urna: Fraunces + Source Serif 4 + IBM Plex Mono.
 
-## ✅ Requisitos
+## Requisitos
 
 - Un navegador moderno (Chrome, Edge, Firefox, Safari). Sin dependencias ni instalación.
 
-## 🚀 Uso
+## Uso
 
 El proyecto es HTML, CSS y JS en estado puro (vanilla). Dos formas de abrirlo:
 
@@ -36,7 +36,7 @@ El proyecto es HTML, CSS y JS en estado puro (vanilla). Dos formas de abrirlo:
 
 > Los módulos `js/` requieren servirse vía HTTP(S); abrir `index.html` con el protocolo `file://` puede bloquearlos.
 
-## 🧭 Cómo funciona
+## Cómo funciona
 
 1. **Inscribe un partido** en el padrón derecho: nombre + color de campaña.
 2. **Vota** desde la papeleta pulsando el botón de un partido. El voto es único y modificable.
@@ -45,7 +45,7 @@ El proyecto es HTML, CSS y JS en estado puro (vanilla). Dos formas de abrirlo:
 
 El estado se guarda en `localStorage`: al recargar, el resultado permanece.
 
-## 📁 Estructura
+## Estructura
 
 ```
 index.html
@@ -64,10 +64,10 @@ assets/              favicon
 docs/                documentación (arquitectura, casos de uso, maquetas)
 ```
 
-## 🤝 Contribuir
+## Contribuir
 
 Consulta [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-## 📜 Licencia
+## Licencia
 
 MIT. Consulta [`LICENSE`](LICENSE).
