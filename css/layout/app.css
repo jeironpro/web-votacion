@@ -1,0 +1,160 @@
+/* Galería del app: la papeleta ocupa todo el viewport, con masthead y colofón
+ * y un padrón lateral que se vuelve panel deslizable en móvil. */
+:root {
+  --gutter: clamp(1rem, 4vw, 1.5rem);
+  --sidebar-w: clamp(17rem, 26vw, 21rem);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100dvh;
+}
+
+/* — Masthead (N6, papeleta) — */
+.mast {
+  display: grid;
+  gap: var(--space-2xs);
+  padding: var(--space-sm) var(--gutter) 0;
+  border-bottom: 0;
+}
+
+.mast__edition {
+  font-variant: all-small-caps;
+  letter-spacing: 0.12em;
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  max-width: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mast__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-block-end: var(--space-sm);
+}
+
+.mast__name {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  max-width: 100%;
+}
+
+.mast__open-sidebar {
+  display: inline-flex;
+}
+
+.mast__rule {
+  border-top: var(--rule-hair) solid var(--color-rule);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+  height: 4px;
+  margin-bottom: 0;
+}
+
+/* — Shell: columna principal + padrón derecha — */
+.shell {
+  display: flex;
+  min-height: 0;
+  position: relative;
+}
+
+.ballot {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-xl) var(--gutter) var(--space-3xl);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* — Padrón: panel derecho (móvil: cajón deslizante) — */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-modal);
+  width: min(21rem, 88vw);
+  padding: var(--space-lg) var(--gutter) var(--space-xl);
+  background: var(--color-paper-2);
+  border-inline-start: var(--rule-hair) solid var(--color-rule);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transform: translateX(106%);
+  transition: transform var(--dur-long) var(--ease-in-out);
+}
+
+.sidebar.is-open {
+  transform: translateX(0);
+  transition-timing-function: var(--ease-out);
+}
+
+.body-sidebar-open {
+  overflow: hidden;
+}
+
+/* Scrim para el cajón (solo visible en móvil). */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modal) - 10);
+  background: oklch(0.18 0.02 55 / 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-short) var(--ease-in-out);
+}
+
+.body-sidebar-open .scrim {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* — Colofón (Ft4) — */
+.foot {
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+  padding: var(--space-sm) var(--gutter);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.foot p {
+  max-width: 100%;
+}
+
+/* — ≥ 60rem: el padrón vuelve a ser columna fija — */
+@media (min-width: 60rem) {
+  .sidebar {
+    position: static;
+    width: var(--sidebar-w);
+    transform: none;
+    background: var(--color-paper-2);
+    z-index: var(--z-base);
+    padding-block: var(--space-xl);
+  }
+
+  .mast__open-sidebar,
+  .sidebar__close,
+  .scrim {
+    display: none !important;
+  }
+}
+
+@media (min-width: 60rem) {
+  .body-sidebar-open {
+    overflow: initial;
+  }
+}
