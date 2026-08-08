@@ -1,0 +1,240 @@
+/* La papeleta: cabecera, escrutinio general y las filas de partidos en liza. */
+.ballot__head {
+  display: grid;
+  gap: var(--space-2xs);
+  margin-block-end: var(--space-lg);
+}
+
+.ballot__title {
+  font-size: clamp(1.9rem, 4.5vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.ballot__lede {
+  color: var(--color-muted);
+  font-size: var(--text-md);
+  max-width: 60ch;
+}
+
+/* — Resumen del escrutinio — */
+.tally {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-block: var(--rule-hair) solid var(--color-rule);
+}
+
+.tally__cell {
+  padding: var(--space-sm) var(--space-sm) var(--space-md);
+}
+
+.tally__cell + .tally__cell {
+  border-inline-start: var(--rule-hair) solid var(--color-rule);
+}
+
+.tally__k {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.tally__v {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-xl);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin-block-start: var(--space-2xs);
+}
+
+.tally__v--yours {
+  color: var(--color-accent);
+}
+
+/* — Cabecera de la mesa (quién va en cabeza) — */
+.bureau {
+  display: grid;
+  gap: var(--space-2xs);
+  padding: var(--space-md) var(--space-sm);
+  margin-block: var(--space-md) 0;
+  border-inline-start: 3px solid var(--color-winner);
+  background: var(--color-paper-2);
+}
+
+.bureau__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.bureau__who {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.bureau__note {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+/* — Filas de partidos — */
+.ballot__list {
+  margin-block-start: var(--space-lg);
+}
+
+.party {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    "rank name  tally act"
+    "bar  bar   bar   bar";
+  align-items: center;
+  column-gap: var(--space-sm);
+  row-gap: var(--space-2xs);
+  padding-block: var(--space-md);
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+}
+
+.party:last-child {
+  border-block-end: var(--rule-hair) solid var(--color-rule);
+}
+
+.party__rank {
+  grid-area: rank;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.party__namegroup {
+  grid-area: name;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.party__chip {
+  flex: none;
+  align-self: baseline;
+  width: 0.85em;
+  height: 0.85em;
+  border-radius: var(--radius-sm);
+  background: var(--chip);
+  transform: translateY(0.1em);
+}
+
+.party__name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.party__lead {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  flex: none;
+}
+
+.party__tally {
+  grid-area: tally;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  text-align: end;
+  white-space: nowrap;
+}
+
+.party__count {
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.party__act {
+  grid-area: act;
+}
+
+/* Barra de porcentaje: solo transform, nada de layout. */
+.party__bar {
+  grid-area: bar;
+  height: 3px;
+  background: var(--color-rule);
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
+.party__bar-fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--chip);
+  border-radius: var(--radius-sm);
+  transform: scaleX(var(--pct, 0));
+  transform-origin: 0 50%;
+  transition: transform var(--dur-long) var(--ease-out);
+}
+
+.party--leader .party__rank {
+  color: var(--color-winner);
+  font-weight: 500;
+}
+
+/* — Estados vacíos de la papeleta — */
+.ballot__empty {
+  padding-block: var(--space-2xl);
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.ballot__empty-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+.ballot__empty-copy {
+  color: var(--color-muted);
+}
+
+.ballot__hint {
+  margin-block-start: var(--space-2xl);
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+/* — Móvil (≤ 40rem): el escrutinio baja bajo el nombre — */
+@media (max-width: 40rem) {
+  .tally {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 40rem) {
+  .party {
+    grid-template-columns: 2rem minmax(0, 1fr) auto;
+    grid-template-areas:
+      "rank name  act"
+      "rank tally act"
+      "bar  bar   bar";
+    column-gap: var(--space-xs);
+  }
+
+  .party__tally {
+    text-align: start;
+  }
+}

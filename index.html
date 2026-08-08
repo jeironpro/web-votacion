@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>La Papeleta · Votación por partidos</title>
+  <meta name="description" content="Papeleta digital: vota por un partido, sigue el escrutinio en directo y descubre al ganador. Datos guardados en tu navegador.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/layout/app.css">
+  <link rel="stylesheet" href="css/components/buttons.css">
+  <link rel="stylesheet" href="css/components/forms.css">
+  <link rel="stylesheet" href="css/components/ballot.css">
+  <link rel="stylesheet" href="css/components/sidebar.css">
+  <link rel="stylesheet" href="css/components/toast.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="mast">
+    <p class="mast__edition" id="mast-edition">Papel impreso de ningún lado · una papeleta, un voto</p>
+    <div class="mast__row">
+      <p class="mast__name">La Papeleta</p>
+      <button class="btn btn--ghost btn--compact mast__open-sidebar" id="open-sidebar" type="button" aria-controls="sidebar" aria-expanded="false">
+        Padrón
+      </button>
+    </div>
+    <hr class="mast__rule" aria-hidden="true">
+  </header>
+
+  <div class="shell">
+    <main class="ballot" id="ballot" aria-live="polite">
+      <div class="ballot__head">
+        <h1 class="ballot__title">El escrutinio, en abierto</h1>
+        <p class="ballot__lede">Un voto por persona, modificable. El partido con más votos manda la página.</p>
+      </div>
+      <dl class="tally" id="tally">
+        <div class="tally__cell">
+          <dt class="tally__k">Partidos</dt>
+          <dd class="tally__v" id="tally-parties">0</dd>
+        </div>
+        <div class="tally__cell">
+          <dt class="tally__k">Votos emitidos</dt>
+          <dd class="tally__v" id="tally-votes">0</dd>
+        </div>
+        <div class="tally__cell">
+          <dt class="tally__k">Tu voto</dt>
+          <dd class="tally__v tally__v--yours" id="tally-mine">—</dd>
+        </div>
+      </dl>
+
+      <div class="bureau" id="bureau" hidden>
+        <p class="bureau__label">Va en cabeza</p>
+        <p class="bureau__who" id="bureau-who">—</p>
+        <p class="bureau__note" id="bureau-note">—</p>
+      </div>
+
+      <section class="ballot__list" id="party-list" aria-label="Partidos en liza">
+        <!-- filas de partidos, renderizadas de forma segura por JS -->
+      </section>
+
+      <p class="ballot__hint">Los datos viven en este navegador. Recarga y el escrutinio permanece.</p>
+    </main>
+
+    <aside class="sidebar" id="sidebar" aria-label="Padrón: gestionar partidos">
+      <div class="sidebar__head">
+        <h2 class="sidebar__title">El padrón</h2>
+        <button class="icon-btn sidebar__close" id="close-sidebar" type="button" aria-label="Cerrar el padrón">Cerrar ×</button>
+      </div>
+      <p class="sidebar__lede">Inscribe un partido en la papeleta. Elige su color de campaña.</p>
+
+      <form class="form" id="party-form" novalidate>
+        <div class="field">
+          <label class="field__label" for="party-name">Nombre del partido</label>
+          <input class="input" id="party-name" name="name" type="text" maxlength="40" placeholder="Ej. Partido del Sol" autocomplete="off" aria-describedby="party-name-helper">
+          <p class="field__helper" id="party-name-helper">Entre 1 y 40 caracteres.</p>
+        </div>
+
+        <fieldset class="field">
+          <legend class="field__label">Color de campaña</legend>
+          <div class="swatches" id="swatches" role="radiogroup" aria-label="Color de campaña">
+            <!-- swatches generados por JS -->
+          </div>
+        </fieldset>
+
+        <button class="btn btn--primary" id="add-party" type="submit">Inscribir partido</button>
+      </form>
+
+      <section class="sidebar__roster" aria-label="Partidos inscritos">
+        <h3 class="sidebar__roster-title">Inscritos</h3>
+        <ul class="roster" id="roster">
+          <!-- filas del padrón generadas por JS -->
+        </ul>
+      </section>
+
+      <p class="sidebar__note">El patrón solo existe localmente: al limpiar datos del navegador, se reinicia la votación.</p>
+    </aside>
+  </div>
+
+  <footer class="foot mono">
+    <p>La Papeleta · escrutinio local v1.0.0 · datos únicamente en tu navegador · sin servidores, sin cuentas. Licencia MIT.</p>
+  </footer>
+
+  <button class="scrim" id="scrim" type="button" aria-label="Cerrar el padrón" tabindex="-1"></button>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

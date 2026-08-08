@@ -1,0 +1,53 @@
+/* Avisos: solo para errores y acciones reversibles; exitoso es silencioso. */
+.toast {
+  position: fixed;
+  inset-inline-end: var(--gutter);
+  bottom: calc(var(--gutter) + env(safe-area-inset-bottom, 0px));
+  z-index: var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  max-width: min(24rem, calc(100vw - 2 * var(--gutter)));
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 1px oklch(0 0 0 / 0.15);
+  transition:
+    opacity var(--dur-short) var(--ease-out),
+    transform var(--dur-short) var(--ease-out);
+}
+
+.toast[hidden] {
+  display: none;
+}
+
+.toast--error {
+  background: var(--color-error);
+  color: var(--color-error-ink);
+}
+
+.toast__msg {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast__action {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 44px;
+  padding-inline: var(--space-2xs);
+}
+
+.toast__action:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

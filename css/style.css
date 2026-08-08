@@ -1,0 +1,79 @@
+/* Base tipográfica y de superficie. Todo lo demás lo aporta cada capa. */
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-size: var(--text-base);
+}
+
+::selection {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* — Foco visible, universal: debe aparecer al instante, nunca animado — */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* — Tipografía base — */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+  font-style: normal;
+}
+
+p {
+  max-width: 65ch;
+  font-weight: 400;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* — Todos los affordances de una sola línea (gate 49) — — */
+.btn,
+.icon-btn,
+.roster__delete,
+.nav-link {
+  white-space: nowrap;
+}
+
+/* — Movimiento reducido: cruce por opacidad (≤150 ms) — — */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 150ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 150ms !important;
+  }
+}

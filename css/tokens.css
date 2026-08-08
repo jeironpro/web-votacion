@@ -1,0 +1,85 @@
+/*
+ * La Papeleta · tokens de diseño
+ * Hallmark · genre: editorial · macrostructure: Catalogue · theme: Almanac
+ * enrichment: none · nav: N6 masthead · footer: Ft4 dense colophon
+ */
+:root {
+  /* — Tipografía — */
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-body: "Source Serif 4", ui-serif, Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* — Colores · Alfabético (superficie marfil, tinta sepia, acento rojo de papeleta) — */
+  --color-paper:     oklch(0.968 0.011 75);
+  --color-paper-2:   oklch(0.941 0.013 75);
+  --color-paper-3:   oklch(0.914 0.014 75);
+  --color-rule:      oklch(0.843 0.012 75);
+  --color-rule-2:    oklch(0.741 0.014 75);
+  --color-neutral:   oklch(0.524 0.02 60);
+  --color-muted:     oklch(0.42 0.02 55);
+  --color-ink:       oklch(0.20 0.02 55);
+  --color-ink-2:     oklch(0.32 0.02 60);
+  --color-accent:    oklch(0.533 0.16 30);
+  --color-accent-ink: oklch(0.97 0.008 60);
+  --color-focus:     oklch(0.455 0.13 255);
+  --color-winner:    oklch(0.45 0.12 255);
+  --color-winner-ink: oklch(0.97 0.008 60);
+  --color-success:   oklch(0.50 0.11 150);
+  --color-error:     oklch(0.505 0.19 28);
+  --color-error-ink: oklch(0.97 0.008 60);
+
+  /* — Paleta de campaña (colores que pueden elegir los partidos) — */
+  --party-rojo:     oklch(0.555 0.19 28);
+  --party-verde:    oklch(0.56 0.14 150);
+  --party-azul:     oklch(0.548 0.15 255);
+  --party-ambar:    oklch(0.68 0.15 75);
+  --party-violeta:  oklch(0.55 0.16 295);
+  --party-cian:     oklch(0.598 0.11 205);
+  --party-rosa:     oklch(0.63 0.15 340);
+  --party-naranja:  oklch(0.63 0.15 55);
+  --party-verdemar: oklch(0.58 0.10 185);
+  --party-vino:     oklch(0.42 0.09 25);
+
+  /* — Escala (proporción 1.25) — */
+  --text-xs:  0.64rem;
+  --text-sm:  0.8rem;
+  --text-base: 1rem;
+  --text-md:  1.25rem;
+  --text-lg:  1.5625rem;
+  --text-xl:  1.9531rem;
+  --text-2xl: 2.4414rem;
+  --text-3xl: 3.0518rem;
+
+  /* — Espaciado (base 4pt) — */
+  --space-3xs: 0.125rem;
+  --space-2xs: 0.25rem;
+  --space-xs:  0.5rem;
+  --space-sm:  0.75rem;
+  --space-md:  1rem;
+  --space-lg:  1.5rem;
+  --space-xl:  2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  /* — Movimiento — */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long:  420ms;
+
+  /* — Capas (z) — */
+  --z-base: 1;
+  --z-raised: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* — Trazos — */
+  --rule-hair: 1px;
+  --rule-thick: 2px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+}
