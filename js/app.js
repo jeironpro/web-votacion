@@ -1,10 +1,10 @@
 /**
  * La Papeleta · punto de entrada.
- * Entrega actual: padrón (alta y baja de partidos) + persistencia local.
- * El escrutinio (votos, barras y ganador) llega en la siguiente entrega.
+ * Gestiona el estado, los eventos y el arranque; la pintura de la interfaz
+ * vive en modules/render.js y la lógica de dominio en modules/*.js.
  */
 import { loadState, saveState } from './services/storage.js';
-import { el, byId, clear } from './utils/dom.js';
+import { el, byId } from './utils/dom.js';
 import { initToast, showToast } from './utils/toast.js';
 import {
   partyRules,
@@ -12,23 +12,17 @@ import {
   addParty,
   removeParty,
   changePartyColor,
-  normalizeColor,
 } from './modules/parties.js';
+import { toggleVote } from './modules/votes.js';
+import {
+  chipOf,
+  renderRoster,
+  renderBallot,
+  renderTally,
+  renderBureau,
+} from './modules/render.js';
 
 const state = loadState();
-
-/** Devuelve el valor CSS de --chip: variable de paleta o hex directo. */
-function chipOf(color) {
-  return isHex(color) ? color : `var(${color})`;
-}
-
-function isHex(value) {
-  return typeof value === 'string' && value.startsWith('#');
-}
-
-function defaultHex(color) {
-  return /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(color) ? normalizeColor(color) : '#666666';
-}
 
 /* — Referencias al DOM — */
 const form = byId('party-form');
@@ -37,13 +31,22 @@ const nameHelper = byId('party-name-helper');
 const swatchesBox = byId('swatches');
 const roster = byId('roster');
 const partyList = byId('party-list');
-const tallyParties = byId('tally-parties');
-const tallyVotes = byId('tally-votes');
-const tallyMine = byId('tally-mine');
+const bureau = byId('bureau');
 const openBtn = byId('open-sidebar');
 const closeBtn = byId('close-sidebar');
 const scrim = byId('scrim');
 const sidebar = byId('sidebar');
+
+const tallyProjectors = {
+  parties: byId('tally-parties'),
+  votes: byId('tally-votes'),
+  mine: byId('tally-mine'),
+};
+
+const bureauProjectors = {
+  who: byId('bureau-who'),
+  note: byId('bureau-note'),
+};
 
 /* — Paleta de campaña (radios convertidos en sellos) + picker libre — */
 let customPickerColor = null;
@@ -80,121 +83,12 @@ function renderSwatches() {
   swatchesBox.append(pickerLabel);
 }
 
-function partyChip(token) {
-  const node = el('span', { className: 'party__chip' });
-  node.style.setProperty('--chip', chipOf(token));
-  return node;
-}
-
-/* — Selector de color de campaña para un partido ya inscrito — */
-function colorPicker(id, color) {
-  const details = el('details', { className: 'roster-color' });
-  const trigger = el('summary', { className: 'roster-color__trigger' });
-  trigger.style.setProperty('--chip', chipOf(color));
-  trigger.setAttribute('aria-label', 'Cambiar color');
-  const swatches = el('span', { className: 'roster-color__swatches' });
-  for (const c of partyRules.palette) {
-    const swatch = el('button', {
-      className: c.token === color ? 'roster-color__swatch is-active' : 'roster-color__swatch',
-      attrs: { type: 'button', 'aria-label': c.name, title: c.name },
-    });
-    swatch.style.setProperty('--chip', chipOf(c.token));
-    swatch.dataset.action = 'repaint';
-    swatch.dataset.id = id;
-    swatch.dataset.color = c.token;
-    swatches.append(swatch);
-  }
-
-  const picker = el('input', {
-    className: 'roster-color__picker',
-    attrs: { type: 'color', 'aria-label': 'Color personalizado', value: defaultHex(color) },
-  });
-  picker.dataset.action = 'repaint-custom';
-  picker.dataset.id = id;
-  swatches.append(picker);
-
-  details.append(trigger, swatches);
-  return details;
-}
-
-/* — Patrón (listado de inscritos) — */
-function renderRoster() {
-  clear(roster);
-  if (state.parties.length === 0) {
-    roster.append(el('li', { className: 'roster__empty', text: 'El padrón está vacío.' }));
-    return;
-  }
-
-  for (const p of state.parties) {
-    const del = el('button', {
-      className: 'roster__delete',
-      attrs: { type: 'button', 'aria-label': `Retirar ${p.name} del padrón` },
-      text: '×',
-    });
-    del.dataset.id = p.id;
-
-    roster.append(
-      el('li', {
-        className: 'roster__item',
-        children: [
-          colorPicker(p.id, p.color),
-          el('span', { className: 'roster__name', text: p.name }),
-          el('span', { className: 'roster__votes tabular', text: `${p.votes}` }),
-          del,
-        ],
-      }),
-    );
-  }
-}
-
-/* — Papeleta: presencia de partidos (el escrutinio llega en la próxima entrega) — */
-function renderBallot() {
-  clear(partyList);
-  if (state.parties.length === 0) {
-    partyList.append(
-      el('div', {
-        className: 'ballot__empty',
-        children: [
-          el('p', { className: 'ballot__empty-title', text: 'Aún no hay partidos en liza.' }),
-          el('p', { className: 'ballot__empty-copy', text: 'Inscribe el primero desde el padrón, a la derecha.' }),
-        ],
-      }),
-    );
-    return;
-  }
-
-  const sorted = [...state.parties].sort((a, b) => a.name.localeCompare(b.name, 'es'));
-
-  for (const [index, p] of sorted.entries()) {
-    const rank = el('span', {
-      className: 'party__rank tabular',
-      text: String(index + 1).padStart(2, '0'),
-    });
-    const namegroup = el('div', {
-      className: 'party__namegroup',
-      children: [partyChip(p.color), el('h3', { className: 'party__name', text: p.name })],
-    });
-    const tally = el('span', {
-      className: 'party__tally tabular',
-      text: `${p.votes} votos`,
-    });
-    partyList.append(el('article', { className: 'party', children: [rank, namegroup, tally] }));
-  }
-}
-
-/* — Resumen del escrutinio — */
-function renderTally() {
-  const total = state.parties.reduce((acc, p) => acc + p.votes, 0);
-  tallyParties.textContent = String(state.parties.length);
-  tallyVotes.textContent = String(total);
-  const voted = state.parties.find((p) => p.id === state.voteId);
-  tallyMine.textContent = voted ? voted.name : '—';
-}
-
+/* — Pintado completo — */
 function renderAll() {
-  renderRoster();
-  renderBallot();
-  renderTally();
+  renderRoster(roster, state.parties);
+  renderBallot(partyList, state);
+  renderTally(tallyProjectors, state);
+  renderBureau(bureau, bureauProjectors, state);
 }
 
 /* — Cajón del padrón (móvil) — */
@@ -281,6 +175,16 @@ swatchesBox.addEventListener('change', (e) => {
     const custom = swatchesBox.querySelector('input[name="color-custom"]');
     if (custom) custom.classList.remove('is-success');
   }
+});
+
+/* — Voto (delegación en la papeleta) — */
+partyList.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-action="vote"]');
+  if (!btn) return;
+  const result = toggleVote(state, btn.dataset.id);
+  if (!result) return;
+  saveState(state);
+  renderAll();
 });
 
 /* — Baja de partidos (optimista, con deshacer) y cambio de color — */
