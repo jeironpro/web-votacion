@@ -19,7 +19,7 @@ const PALETTE = Object.freeze([
 
 const MAX_NAME_LENGTH = 40;
 
-const HEX_RE = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
+export const HEX_RE = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
 
 function normalizeName(name) {
   return name.replace(/\s+/g, ' ').trim();

@@ -3,7 +3,7 @@
  * Las plantillas reciben la raíz y el estado; nada se guarda aquí.
  */
 import { el, clear } from '../utils/dom.js';
-import { partyRules, normalizeColor } from './parties.js';
+import { partyRules, normalizeColor, HEX_RE } from './parties.js';
 
 /* — Colores de campaña como --chip: variable de paleta o hex directo — */
 function isHex(value) {
@@ -15,18 +15,13 @@ export function chipOf(color) {
 }
 
 function defaultHex(color) {
-  return /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(color) ? normalizeColor(color) : '#666666';
+  return HEX_RE.test(color) ? normalizeColor(color) : '#666666';
 }
 
 function partyChip(token) {
   const node = el('span', { className: 'party__chip' });
   node.style.setProperty('--chip', chipOf(token));
   return node;
-}
-
-/* — Selector de color de campaña para un partido ya inscrito — */
-function colorPicker(id, color) {
-  return campaignColorPicker({ id, value: color, action: 'repaint', customAction: 'repaint-custom' });
 }
 
 /* — Selector de color a elección (padrón y alta de partidos): popup propio
@@ -81,7 +76,7 @@ export function renderRoster(root, parties) {
       el('li', {
         className: 'roster__item',
         children: [
-          colorPicker(p.id, p.color),
+          campaignColorPicker({ id: p.id, value: p.color, action: 'repaint', customAction: 'repaint-custom' }),
           el('span', { className: 'roster__name', text: p.name }),
           el('span', { className: 'roster__votes tabular', text: `${p.votes}` }),
           del,
