@@ -51,7 +51,3 @@ export function showToast({ message, tone = 'error', action = null } = {}) {
   clearTimeout(hideTimer);
   hideTimer = setTimeout(hide, 6000);
 }
-
-export function dismissToast() {
-  hide();
-}
