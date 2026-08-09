@@ -138,7 +138,7 @@ body {
 /* — ≥ 60rem: el padrón vuelve a ser columna fija — */
 @media (min-width: 60rem) {
   .sidebar {
-    position: static;
+    position: relative;
     width: var(--sidebar-w);
     transform: none;
     background: var(--color-paper-2);

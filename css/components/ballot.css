@@ -166,6 +166,18 @@
 
 .party__act {
   grid-area: act;
+  justify-self: end;
+}
+
+.party__vote {
+  min-height: 44px;
+  padding-inline: var(--space-sm);
+}
+
+.party__vote.is-voted {
+  border-color: var(--color-accent);
+  background: var(--color-accent-ink);
+  color: var(--color-accent);
 }
 
 /* Barra de porcentaje: solo transform, nada de layout. */
