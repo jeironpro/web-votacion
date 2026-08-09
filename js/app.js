@@ -16,6 +16,7 @@ import {
 import { toggleVote } from './modules/votes.js';
 import {
   chipOf,
+  campaignColorPicker,
   renderRoster,
   renderBallot,
   renderTally,
@@ -48,12 +49,12 @@ const bureauProjectors = {
   note: byId('bureau-note'),
 };
 
-/* — Paleta de campaña (radios convertidos en sellos) + picker libre — */
+/* — Paleta de campaña (radios convertidos en sellos) + color a elección — */
 let customPickerColor = null;
 
 function renderSwatches() {
   clear(swatchesBox);
-  partyRules.palette.forEach((color, index) => {
+  partyRules.palette.forEach((color) => {
     const label = el('label', { className: 'swatch-label' });
     const input = el('input', {
       className: 'swatch-input',
@@ -64,23 +65,14 @@ function renderSwatches() {
         'aria-label': color.name,
       },
     });
-    if (index === 0 && customPickerColor === null) input.checked = true;
+    input.checked = customPickerColor === null && color.token === partyRules.palette[0].token;
     const swatch = el('span', { className: 'swatch' });
     swatch.style.setProperty('--chip', chipOf(color.token));
     label.append(input, swatch);
     swatchesBox.append(label);
   });
 
-  const pickerLabel = el('label', { className: 'swatch-label' });
-  const picker = el('input', {
-    className: 'swatch-input',
-    attrs: { type: 'color', name: 'color-custom', 'aria-label': 'Color personalizado' },
-  });
-  picker.value = customPickerColor || '#8a4f7d';
-  const pickerSwatch = el('span', { className: 'swatch' });
-  pickerSwatch.style.setProperty('--chip', picker.value);
-  pickerLabel.append(picker, pickerSwatch);
-  swatchesBox.append(pickerLabel);
+  swatchesBox.append(campaignColorPicker({ value: customPickerColor || '#8a4f7d' }));
 }
 
 /* — Pintado completo — */
@@ -152,29 +144,35 @@ form.addEventListener('submit', (e) => {
   renderAll();
 });
 
-/* — Paleta: al tocar el picker custom se deseleccionan los sellos y viceversa — */
-swatchesBox.addEventListener('input', (e) => {
-  const target = e.target;
-  if (target.matches('input[name="color-custom"]')) {
-    customPickerColor = target.value;
-    const sync = swatchesBox.querySelector('input[name="color-custom"]').parentElement
-      .querySelector('.swatch');
-    sync.style.setProperty('--chip', target.value);
-    swatchesBox.querySelectorAll('input[name="color"]').forEach((r) => {
-      r.checked = false;
-    });
-    swatchesBox.querySelectorAll('.swatch-input').forEach((i) => i.classList.remove('is-success'));
-    target.classList.add('is-success');
-  }
-});
-
+/* — Paleta: selección de sello o color a elección (popup propio) — */
 swatchesBox.addEventListener('change', (e) => {
   if (e.target.matches('input[name="color"]')) {
     customPickerColor = null;
     swatchesBox.querySelectorAll('.swatch-input').forEach((i) => i.classList.remove('is-success'));
-    const custom = swatchesBox.querySelector('input[name="color-custom"]');
-    if (custom) custom.classList.remove('is-success');
   }
+});
+
+swatchesBox.addEventListener('click', (e) => {
+  const pick = e.target.closest('[data-action="custom-color"]');
+  if (!pick) return;
+  customPickerColor = pick.dataset.color;
+  const custom = swatchesBox.querySelector('.swatch-custom__trigger');
+  if (custom) custom.style.setProperty('--chip', chipOf(customPickerColor));
+  swatchesBox.querySelectorAll('input[name="color"]').forEach((r) => {
+    r.checked = false;
+  });
+  pick.closest('details').removeAttribute('open');
+});
+
+swatchesBox.addEventListener('input', (e) => {
+  const pick = e.target.closest('[data-action="custom-color-lib"]');
+  if (!pick) return;
+  customPickerColor = pick.value;
+  const custom = swatchesBox.querySelector('.swatch-custom__trigger');
+  if (custom) custom.style.setProperty('--chip', pick.value);
+  swatchesBox.querySelectorAll('input[name="color"]').forEach((r) => {
+    r.checked = false;
+  });
 });
 
 /* — Voto (delegación en la papeleta) — */

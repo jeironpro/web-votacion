@@ -146,3 +146,28 @@
 .swatch-input.is-success + .swatch {
   border-color: var(--color-success);
 }
+
+/* — Color a elección: swatch nativo sustituido por un popup propio
+  centrado en el sidebar (el contenedor posicionado del formulario). — */
+.swatches .swatch-custom {
+  width: 40px;
+  height: 40px;
+}
+
+.swatches .swatch-custom__trigger {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background:
+    conic-gradient(from 45deg, #e5484d, #46a758, #3b82f6, #f0b429, #8e4ec6, #06b6d4, #ec4899, #f97316),
+    var(--color-rule-2);
+}
+
+.swatches .swatch-custom__trigger:hover {
+  transform: scale(1.15);
+}
+
+.swatches .swatch-custom__trigger:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

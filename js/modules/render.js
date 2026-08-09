@@ -26,29 +26,35 @@ function partyChip(token) {
 
 /* — Selector de color de campaña para un partido ya inscrito — */
 function colorPicker(id, color) {
-  const details = el('details', { className: 'roster-color' });
-  const trigger = el('summary', { className: 'roster-color__trigger' });
-  trigger.style.setProperty('--chip', chipOf(color));
-  trigger.setAttribute('aria-label', 'Cambiar color');
+  return campaignColorPicker({ id, value: color, action: 'repaint', customAction: 'repaint-custom' });
+}
+
+/* — Selector de color a elección (padrón y alta de partidos): popup propio
+   anclado al contenedor posicionado (el sidebar), centrado en él. — */
+export function campaignColorPicker({ id, value, action = 'custom-color', customAction = 'custom-color-lib' }) {
+  const details = el('details', { className: 'roster-color swatch-custom' });
+  const trigger = el('summary', { className: 'roster-color__trigger swatch-custom__trigger' });
+  trigger.style.setProperty('--chip', chipOf(value));
+  trigger.setAttribute('aria-label', 'Elegir color');
   const swatches = el('span', { className: 'roster-color__swatches' });
   for (const c of partyRules.palette) {
     const swatch = el('button', {
-      className: c.token === color ? 'roster-color__swatch is-active' : 'roster-color__swatch',
+      className: c.token === value ? 'roster-color__swatch is-active' : 'roster-color__swatch',
       attrs: { type: 'button', 'aria-label': c.name, title: c.name },
     });
     swatch.style.setProperty('--chip', chipOf(c.token));
-    swatch.dataset.action = 'repaint';
-    swatch.dataset.id = id;
+    swatch.dataset.action = action;
+    swatch.dataset.id = id ?? '';
     swatch.dataset.color = c.token;
     swatches.append(swatch);
   }
 
   const picker = el('input', {
     className: 'roster-color__picker',
-    attrs: { type: 'color', 'aria-label': 'Color personalizado', value: defaultHex(color) },
+    attrs: { type: 'color', 'aria-label': 'Color libre', value: defaultHex(value) },
   });
-  picker.dataset.action = 'repaint-custom';
-  picker.dataset.id = id;
+  picker.dataset.action = customAction;
+  picker.dataset.id = id ?? '';
   swatches.append(picker);
 
   details.append(trigger, swatches);
