@@ -50,6 +50,7 @@ const bureauProjectors = {
 };
 
 /* — Paleta de campaña (radios convertidos en sellos) + color a elección — */
+const DEFAULT_TOKEN = partyRules.palette[0].token;
 let customPickerColor = null;
 
 function renderSwatches() {
@@ -65,7 +66,7 @@ function renderSwatches() {
         'aria-label': color.name,
       },
     });
-    input.checked = customPickerColor === null && color.token === partyRules.palette[0].token;
+    input.checked = customPickerColor === null && color.token === DEFAULT_TOKEN;
     const swatch = el('span', { className: 'swatch' });
     swatch.style.setProperty('--chip', chipOf(color.token));
     label.append(input, swatch);
@@ -73,6 +74,16 @@ function renderSwatches() {
   });
 
   swatchesBox.append(campaignColorPicker({ value: customPickerColor || '#8a4f7d' }));
+}
+
+/* Marca el color elegido libre: recuerda, pinta el trigger y desmarca los sellos. */
+function markCustomColor(value) {
+  customPickerColor = value;
+  const custom = swatchesBox.querySelector('.swatch-custom__trigger');
+  if (custom) custom.style.setProperty('--chip', chipOf(value));
+  swatchesBox.querySelectorAll('input[name="color"]').forEach((r) => {
+    r.checked = false;
+  });
 }
 
 /* — Pintado completo — */
@@ -126,7 +137,7 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
   const color = customPickerColor
     ?? swatchesBox.querySelector('input[name="color"]:checked')?.value
-    ?? partyRules.palette[0].token;
+    ?? DEFAULT_TOKEN;
   const result = validatePartyInput(state, { name: nameInput.value, color });
 
   if (result.error) {
@@ -146,33 +157,20 @@ form.addEventListener('submit', (e) => {
 
 /* — Paleta: selección de sello o color a elección (popup propio) — */
 swatchesBox.addEventListener('change', (e) => {
-  if (e.target.matches('input[name="color"]')) {
-    customPickerColor = null;
-    swatchesBox.querySelectorAll('.swatch-input').forEach((i) => i.classList.remove('is-success'));
-  }
+  if (e.target.matches('input[name="color"]')) customPickerColor = null;
 });
 
 swatchesBox.addEventListener('click', (e) => {
   const pick = e.target.closest('[data-action="custom-color"]');
   if (!pick) return;
-  customPickerColor = pick.dataset.color;
-  const custom = swatchesBox.querySelector('.swatch-custom__trigger');
-  if (custom) custom.style.setProperty('--chip', chipOf(customPickerColor));
-  swatchesBox.querySelectorAll('input[name="color"]').forEach((r) => {
-    r.checked = false;
-  });
+  markCustomColor(pick.dataset.color);
   pick.closest('details').removeAttribute('open');
 });
 
 swatchesBox.addEventListener('input', (e) => {
   const pick = e.target.closest('[data-action="custom-color-lib"]');
   if (!pick) return;
-  customPickerColor = pick.value;
-  const custom = swatchesBox.querySelector('.swatch-custom__trigger');
-  if (custom) custom.style.setProperty('--chip', pick.value);
-  swatchesBox.querySelectorAll('input[name="color"]').forEach((r) => {
-    r.checked = false;
-  });
+  markCustomColor(pick.value);
 });
 
 /* — Voto (delegación en la papeleta) — */

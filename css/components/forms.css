@@ -18,10 +18,6 @@
   color: var(--color-muted);
 }
 
-.field[data-state-warn] .field__label {
-  color: var(--color-error);
-}
-
 /* — Input: el grosor de borde nunca cambia (sin salto de layout) — */
 .input {
   width: 100%;
@@ -141,10 +137,6 @@
 .swatch-input:disabled + .swatch {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.swatch-input.is-success + .swatch {
-  border-color: var(--color-success);
 }
 
 /* — Color a elección: swatch nativo sustituido por un popup propio
