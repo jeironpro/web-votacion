@@ -4,7 +4,7 @@
  * vive en modules/render.js y la lógica de dominio en modules/*.js.
  */
 import { loadState, saveState } from './services/storage.js';
-import { el, byId } from './utils/dom.js';
+import { el, byId, clear } from './utils/dom.js';
 import { initToast, showToast } from './utils/toast.js';
 import {
   partyRules,
