@@ -96,10 +96,6 @@ export function changePartyColor(state, id, value) {
   return party;
 }
 
-export function hasDuplicate(state, name) {
-  return isDuplicate(state, normalizeName(name));
-}
-
 export const partyRules = {
   maxLength: MAX_NAME_LENGTH,
   palette: PALETTE,

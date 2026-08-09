@@ -32,15 +32,6 @@ export function loadState() {
   }
 }
 
-/** Clona el estado para no compartir referencias con la respuesta de carga. */
-export function cloneState(state) {
-  return {
-    version: STATE_VERSION,
-    parties: state.parties.map((p) => ({ ...p })),
-    voteId: state.voteId,
-  };
-}
-
 /** Guarda el estado completo. Los errores se tratan en silencio: los datos son
  * locales y cada recarga conserva el último estado íntegro. */
 export function saveState(state) {
@@ -49,12 +40,4 @@ export function saveState(state) {
   } catch {
     /* almacenamiento no disponible o lleno: nada que hacer */
   }
-}
-
-export function clearState() {
-  localStorage.removeItem(STORAGE_KEY);
-}
-
-export function getStorageKey() {
-  return STORAGE_KEY;
 }

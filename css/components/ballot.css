@@ -219,12 +219,6 @@
 
 /* — Móvil (≤ 40rem): el escrutinio baja bajo el nombre — */
 @media (max-width: 40rem) {
-  .tally {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 40rem) {
   .party {
     grid-template-columns: 2rem minmax(0, 1fr) auto;
     grid-template-areas:

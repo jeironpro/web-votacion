@@ -227,7 +227,7 @@ function setError(message) {
 }
 
 function clearError() {
-  nameHelper.textContent = 'Entre 1 y 40 caracteres.';
+  nameHelper.textContent = `Entre 1 y ${partyRules.maxLength} caracteres.`;
   nameHelper.classList.remove('field__helper--error');
   nameInput.removeAttribute('aria-invalid');
 }
@@ -326,6 +326,7 @@ roster.addEventListener('input', (e) => {
 
 /* — Arranque — */
 initToast();
+nameInput.maxLength = partyRules.maxLength;
 renderSwatches();
 renderAll();
 document.documentElement.dataset.ready = 'true';
